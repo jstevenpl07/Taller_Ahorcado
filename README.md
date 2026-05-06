@@ -26,6 +26,9 @@ Durante el desarrollo de este proyecto se utilizaron:
 - [Video java #12 Funciones](https://www.w3schools.com/java/java_methods.asp).
 - [Video archivo csv](https://www.baeldung.com/java-csv-file-array).
 
+# Link presentacion
+- [Presentacion](https://www.canva.com/design/DAHI3IUBID0/vPV84EqaM-p3VunID-Vetg/edit).
+
 ## Participantes
 - **John Steven.**
 - **Nicolas Toro.**
