@@ -5,12 +5,6 @@ public class JuegoAhorcado {
 
     static Scanner sc = new Scanner(System.in);
 
-    // 🎨 COLORES ANSI
-    static final String VERDE = "\u001B[32m";
-    static final String ROJO = "\u001B[31m";
-    static final String AMARILLO = "\u001B[33m";
-    static final String RESET = "\u001B[0m";
-
     public static void main(String[] args) {
 
         String opcion;
@@ -30,71 +24,79 @@ public class JuegoAhorcado {
                     mostrarRanking("puntajes.csv");
                     break;
                 case "4":
-                    System.out.println("👋 Hasta luego");
+                    System.out.println(">>> Hasta luego");
                     break;
                 default:
-                    System.out.println("❌ Opción inválida");
+                    System.out.println("[!] Opción inválida");
             }
 
         } while (!opcion.equals("4"));
     }
 
-    // 📋 MENÚ
+    // 🎮 MENÚ CON ASCII "AHORCADO"
     public static void mostrarMenu() {
         System.out.println(
+            "\n" +
+            " █████╗ ██╗  ██╗ ██████╗ ██████╗  ██████╗ █████╗ ██████╗  ██████╗ \n" +
+            "██╔══██╗██║  ██║██╔═══██╗██╔══██╗██╔════╝██╔══██╗██╔══██╗██╔═══██╗\n" +
+            "███████║███████║██║   ██║██████╔╝██║     ███████║██║  ██║██║   ██║\n" +
+            "██╔══██║██╔══██║██║   ██║██╔══██╗██║     ██╔══██║██║  ██║██║   ██║\n" +
+            "██║  ██║██║  ██║╚██████╔╝██║  ██║╚██████╗██║  ██║██████╔╝╚██████╔╝\n" +
+            "╚═╝  ╚═╝╚═╝  ╚═╝ ╚═════╝ ╚═╝  ╚═╝ ╚═════╝╚═╝  ╚═╝╚═════╝ ╚═════╝ \n" +
+
             "\n╔══════════════════════════════════════╗\n" +
-            "║        🎮 AHORCADO PRO MAX 🎮         ║\n" +
-            "╠══════════════════════════════════════ ╣\n" +
-            "║ 1. Jugar                              ║\n" +
-            "║ 2. Instrucciones                      ║\n" +
-            "║ 3. Tabla de récords                   ║\n" +
-            "║ 4. Salir                              ║\n" +
-            "╚══════════════════════════════════════ ╝"
+            "║          AHORCADO PRO MAX            ║\n" +
+            "╠══════════════════════════════════════╣\n" +
+            "║ 1. Jugar                             ║\n" +
+            "║ 2. Instrucciones                     ║\n" +
+            "║ 3. Ranking                           ║\n" +
+            "║ 4. Salir                             ║\n" +
+            "╚══════════════════════════════════════╝\n"
         );
     }
 
     // 📘 INSTRUCCIONES
     public static void mostrarInstrucciones() {
         System.out.println(
-            "\n📘 INSTRUCCIONES:\n" +
+            "\n[INFO] INSTRUCCIONES:\n" +
             "- Adivina la palabra letra por letra\n" +
             "- Tienes 6 intentos\n" +
-            "- '*' = pista (-1 intento)\n" +
-            "- Completa la palabra para ganar\n"
+            "- Usa '*' para obtener una pista (-1 intento, solo una vez)\n"
         );
     }
 
     // 🎮 JUEGO
     public static void jugar() {
 
-        Map<String, List<String>> categorias = cargarCSV("Palabras.csv");
+        Map<String, List<String>> categorias = cargarCSV("palabras.csv");
 
-        System.out.print("👤 Ingresa tu nombre: ");
-        String nombre = sc.nextLine().trim().toUpperCase();
+        if (categorias.isEmpty()) {
+            System.out.println("[!] No hay categorías disponibles");
+            return;
+        }
 
-        boolean modoDios = verificarEasterEgg(nombre);
+        System.out.print("> Nombre: ");
+        String nombre = sc.nextLine();
+
+        boolean modoDios = nombre.equalsIgnoreCase("XACARANA");
 
         if (modoDios) {
             animacionModoDios();
             mostrarCelebracion();
-
-            categorias.put("Secretos", Arrays.asList(
-                "darthvader", "matrix", "zelda", "tardis", "konami"
-            ));
         }
 
-        System.out.println("\n📂 CATEGORÍAS:");
+        System.out.println("\nCategorías:");
         for (String cat : categorias.keySet()) {
             System.out.println("- " + cat);
         }
 
         System.out.print("Elige categoría: ");
-        String input = sc.nextLine().trim();
+        String input = sc.nextLine();
 
         String categoria = buscarCategoria(categorias, input);
 
         if (categoria == null) {
-            System.out.println("❌ Categoría inválida");
+            System.out.println("[!] Categoría inválida");
             return;
         }
 
@@ -104,8 +106,8 @@ public class JuegoAhorcado {
         int errores = 0;
         boolean usoPista = false;
 
-        // BONUS: primera letra
-        if (modoDios) {
+        // Bonus modo dios: revela primera letra
+        if (modoDios && palabra.length() > 0) {
             estado = actualizarEstado(palabra, estado, palabra.charAt(0));
         }
 
@@ -114,46 +116,67 @@ public class JuegoAhorcado {
             mostrarAhorcado(errores);
             mostrarEstado(estado);
 
-            System.out.print("Letra (* pista): ");
+            System.out.println("(i) Escribe '*' para usar una pista (-1 intento)");
+            System.out.print("Letra: ");
             String entrada = sc.nextLine();
 
-            if (entrada.equals("*") && !usoPista) {
-                estado = darPista(palabra, estado);
-                errores++;
-                usoPista = true;
+            // VALIDACIONES
+            if (entrada.isEmpty()) {
+                System.out.println("[!] Ingresa una letra");
+                continue;
+            }
+
+            // PISTA
+            if (entrada.equals("*")) {
+                if (!usoPista) {
+                    estado = darPista(palabra, estado);
+                    errores++;
+                    usoPista = true;
+                    System.out.println("(i) Pista usada (-1 intento)");
+                } else {
+                    System.out.println("[!] Ya usaste la pista");
+                }
+                continue;
+            }
+
+            // SOLO UNA LETRA
+            if (entrada.length() > 1) {
+                System.out.println("[!] Solo puedes ingresar una letra");
                 continue;
             }
 
             char letra = entrada.charAt(0);
 
+            if (!Character.isLetter(letra)) {
+                System.out.println("[!] Ingresa solo letras");
+                continue;
+            }
+
             String nuevo = actualizarEstado(palabra, estado, letra);
 
             if (nuevo.equals(estado)) {
                 errores++;
+                System.out.println("[X] Letra incorrecta");
             } else {
                 estado = nuevo;
+                System.out.println("[OK] Bien");
             }
         }
 
         mostrarAhorcado(errores);
 
         if (estaCompleta(estado)) {
-            System.out.println(VERDE + "🎉 GANASTE 🎉" + RESET);
+            System.out.println(">>> GANASTE <<<");
             guardarPuntaje("puntajes.csv", nombre, 1);
         } else {
-            System.out.println(ROJO + "💀 PERDISTE 💀 Palabra: " + palabra + RESET);
+            System.out.println("--- PERDISTE --- Palabra: " + palabra);
             guardarPuntaje("puntajes.csv", nombre, 0);
         }
     }
 
-    // 🥚 EASTER EGG
-    public static boolean verificarEasterEgg(String nombre) {
-        return nombre.equalsIgnoreCase("XACARANA");
-    }
-
-    // ⚡ ANIMACIÓN
+    // 🥚 ANIMACIÓN MODO DIOS
     public static void animacionModoDios() {
-        System.out.print("⚡ Activando modo Dios");
+        System.out.print(">>> Activando modo Dios");
         try {
             for (int i = 0; i < 3; i++) {
                 Thread.sleep(500);
@@ -163,41 +186,40 @@ public class JuegoAhorcado {
         System.out.println("\n");
     }
 
-    // 🎨 ASCII PRO
+    // 🥚 ASCII MODO DIOS
     public static void mostrarCelebracion() {
-        System.out.println(AMARILLO +
+        System.out.println(
             "\n" +
-            "╔══════════════════════════════════════════╗\n" +
-            "║        ✨🔥 MODO DIOS ACTIVADO 🔥✨       ║\n" +
-            "╚══════════════════════════════════════════╝\n" +
+            "╔══════════════════════════════════════════════╗\n" +
+            "║          *** MODO DIOS ACTIVADO ***          ║\n" +
+            "╚══════════════════════════════════════════════╝\n" +
 
-            "          ⚡⚡⚡⚡⚡⚡⚡⚡⚡\n" +
-            "        ⚡             ⚡\n" +
-            "      ⚡   😎  XACARANA  😎  ⚡\n" +
-            "        ⚡             ⚡\n" +
-            "          ⚡⚡⚡⚡⚡⚡⚡⚡⚡\n" +
+            "        ***********************\n" +
+            "        *                     *\n" +
+            "        *      XACARANA       *\n" +
+            "        *                     *\n" +
+            "        ***********************\n" +
 
             "\n" +
-            "        💥 PODER DESBLOQUEADO 💥\n" +
-            "     🧠 +INTELIGENCIA  ⚔️ +SUERTE\n" +
-            "        🚀 +VELOCIDAD  🎯 +PRECISIÓN\n" +
+            "            PODER DESBLOQUEADO\n" +
+            "     + INTELIGENCIA      + SUERTE\n" +
+            "     + VELOCIDAD         + PRECISION\n" +
             "\n" +
-            "      🏆 ¡ERES UN JUGADOR LEGENDARIO! 🏆\n"
-        + RESET);
+            "        ¡ERES UN JUGADOR LEGENDARIO!\n"
+        );
     }
 
-    // 🔤 STRING
+    // 🔤 LÓGICA DE CADENAS
     public static String actualizarEstado(String palabra, String estado, char letra) {
-        String nuevo = "";
-
+        StringBuilder nuevo = new StringBuilder();
         for (int i = 0; i < palabra.length(); i++) {
             if (palabra.charAt(i) == letra) {
-                nuevo += letra;
+                nuevo.append(letra);
             } else {
-                nuevo += estado.charAt(i);
+                nuevo.append(estado.charAt(i));
             }
         }
-        return nuevo;
+        return nuevo.toString();
     }
 
     public static String darPista(String palabra, String estado) {
@@ -224,20 +246,26 @@ public class JuegoAhorcado {
         return lista.get((int)(Math.random() * lista.size()));
     }
 
-    // 📂 CSV
+    public static String buscarCategoria(Map<String, List<String>> categorias, String input) {
+        for (String cat : categorias.keySet()) {
+            if (cat.equalsIgnoreCase(input)) return cat;
+        }
+        return null;
+    }
+
+    // 📂 CSV (robusto)
     public static Map<String, List<String>> cargarCSV(String archivo) {
         Map<String, List<String>> mapa = new HashMap<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
-
             String linea;
-            br.readLine();
+            br.readLine(); // encabezado
 
             while ((linea = br.readLine()) != null) {
-                if (linea.trim().isEmpty()) continue; // Ignora líneas vacías
+                if (linea.trim().isEmpty()) continue;
 
                 String[] p = linea.split(",");
-                if (p.length < 2) continue; // Salta líneas que no tengan el formato correcto
+                if (p.length < 2) continue;
 
                 String categoria = p[0].trim();
                 String palabra = p[1].trim();
@@ -245,37 +273,31 @@ public class JuegoAhorcado {
                 mapa.putIfAbsent(categoria, new ArrayList<>());
                 mapa.get(categoria).add(palabra);
             }
-
         } catch (Exception e) {
-            System.out.println("Error CSV");
+            System.out.println("[!] Error leyendo CSV");
         }
 
         return mapa;
     }
 
-    // 🏆 RANKING
+    // RANKING
     public static void mostrarRanking(String archivo) {
-
         Map<String, Integer> ranking = new HashMap<>();
 
         try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
-
             String linea;
             while ((linea = br.readLine()) != null) {
-                if (linea.trim().isEmpty()) continue;
-
                 String[] p = linea.split(",");
                 if (p.length < 2) continue;
-
-                String nombreRef = p[0].trim().toUpperCase();
-                ranking.put(nombreRef, ranking.getOrDefault(nombreRef, 0) + Integer.parseInt(p[1]));
+                String nombre = p[0];
+                int puntos = Integer.parseInt(p[1]);
+                ranking.put(nombre, ranking.getOrDefault(nombre, 0) + puntos);
             }
-
         } catch (Exception e) {
             System.out.println("Error ranking");
         }
 
-        System.out.println("\n🏆 RANKING:");
+        System.out.println("\n[RANKING] Puntajes:");
         ranking.entrySet()
                 .stream()
                 .sorted((a, b) -> b.getValue() - a.getValue())
@@ -290,16 +312,8 @@ public class JuegoAhorcado {
         }
     }
 
-    public static String buscarCategoria(Map<String, List<String>> categorias, String input) {
-        for (String cat : categorias.keySet()) {
-            if (cat.equalsIgnoreCase(input)) return cat;
-        }
-        return null;
-    }
-
     // 🎨 AHORCADO
     public static void mostrarAhorcado(int e) {
-
         String[] estados = {
             " +---+\n |   |\n     |\n     |\n     |\n     |\n=======",
             " +---+\n |   |\n O   |\n     |\n     |\n     |\n=======",
@@ -309,7 +323,6 @@ public class JuegoAhorcado {
             " +---+\n |   |\n O   |\n/|\\  |\n/    |\n     |\n=======",
             " +---+\n |   |\n O   |\n/|\\  |\n/ \\  |\n     |\n======="
         };
-
         System.out.println(estados[e]);
     }
 }
