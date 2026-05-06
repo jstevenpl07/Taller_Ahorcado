@@ -10,13 +10,9 @@ public class CargadorCSV {
 
         try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
             String linea;
-            br.readLine(); // Error 1: Saltar el encabezado para no jugar con la palabra "categoria" o "palabra"
-
+            br.readLine(); 
             while ((linea = br.readLine()) != null) {
-                // Suponiendo que cada línea tiene una palabra
-                // o que están separadas por comas
                 String[] partes = linea.split(",");
-
                 for (String palabra : partes) {
                     palabras.add(palabra.trim());
                 }
@@ -29,7 +25,7 @@ public class CargadorCSV {
         return palabras;
     
     }
-} // Error 2: Se agregó la llave de cierre de la clase que faltaba
+} 
 
 
     
