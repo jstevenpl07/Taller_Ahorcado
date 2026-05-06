@@ -21,6 +21,11 @@ Arreglos o listas
 Manejo de cadenas (String)
 Entrada de datos por consola
 
+# Links Utilizados
+-https://www.w3schools.com/java/java_strings.asp
+-https://www.w3schools.com/java/java_methods.asp
+-https://www.baeldung.com/java-csv-file-array
+
 ## Participantes
 John Steven
 Nicolas Toro
