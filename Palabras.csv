@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 categoria,palabra
 Animales,perro
 Animales,gato
@@ -27,4 +28,35 @@ Peliculas,avatar
 Peliculas,titanic
 Peliculas,gladiador
 Peliculas,batman
+=======
+categoria,palabra
+Animales,perro
+Animales,gato
+Animales,conejo
+Animales,tigre
+Animales,elefante
+
+Paises,colombia
+Paises,mexico
+Paises,argentina
+Paises,brasil
+Paises,chile
+
+Programacion,java
+Programacion,python
+Programacion,html
+Programacion,css
+Programacion,funciones
+
+Deportes,futbol
+Deportes,tenis
+Deportes,basket
+Deportes,beisbol
+Deportes,natacion
+
+Peliculas,avatar
+Peliculas,titanic
+Peliculas,gladiador
+Peliculas,batman
+>>>>>>> efb58cc901d04cff16f8585f6a3e223b1dc5cde1
 Peliculas,inception
